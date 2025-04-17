@@ -166,6 +166,17 @@ using nativeForkAndSpecialize_samsung_m_t = jint(
 
 // -----------------------------------------------------------------
 
+const static char *nativeSpecializeAppProcess_xtc_sig = "(II[II[[IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V";
+
+using nativeSpecializeAppProcess_xtc_t = jint(
+        JNIEnv *, jclass, jint, jint, jintArray, jint, jobjectArray, jint, jstring, jstring,
+        jstring, jstring);
+
+[[clang::no_stack_protector]] void nativeSpecializeAppProcess_xtc(
+        JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint debug_flags,
+        jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name,
+        jstring instructionSet, jstring appDataDir);
+
 const static char *nativeSpecializeAppProcess_q_sig = "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V";
 
 using nativeSpecializeAppProcess_q_t = void(

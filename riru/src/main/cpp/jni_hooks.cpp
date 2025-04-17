@@ -90,6 +90,8 @@ onRegisterZygote(const char *className, const JNINativeMethod *methods, int numM
                                                                           method.fnPtr};
             if (strcmp(nativeSpecializeAppProcess_u_sig, method.signature) == 0)
                 newMethods[i].fnPtr = (void *) nativeSpecializeAppProcess_u;
+            else if (strcmp(nativeSpecializeAppProcess_xtc_sig, method.signature) == 0)
+                newMethods[i].fnPtr = (void *) nativeSpecializeAppProcess_xtc;
             else if (strcmp(nativeSpecializeAppProcess_r_sig, method.signature) == 0)
                 newMethods[i].fnPtr = (void *) nativeSpecializeAppProcess_r;
             else if (strcmp(nativeSpecializeAppProcess_q_sig, method.signature) == 0)
@@ -420,6 +422,7 @@ static void nativeForkSystemServer_post(JNIEnv *env, jclass clazz, jint res) {
 }
 
 // -----------------------------------------------------------------
+
 [[clang::no_stack_protector]]
 jint nativeForkAndSpecialize_marshmallow(
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint debug_flags,
@@ -747,6 +750,31 @@ jint nativeForkAndSpecialize_samsung_m(
 }
 
 // -----------------------------------------------------------------
+[[clang::no_stack_protector]]
+void nativeSpecializeAppProcess_xtc(
+        JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint debug_flags,
+        jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name,
+        jstring instructionSet, jstring appDataDir) {
+
+    jboolean isTopApp = JNI_FALSE;
+    jobjectArray pkgDataInfoList = nullptr;
+    jobjectArray whitelistedDataInfoList = nullptr;
+    jboolean startChildZygote = JNI_FALSE;
+    jboolean bindMountAppDataDirs = JNI_FALSE;
+    jboolean bindMountAppStorageDirs = JNI_FALSE;
+
+    nativeSpecializeAppProcess_pre(
+            env, clazz, uid, gid, gids, debug_flags, rlimits, mount_external, se_info, nice_name,
+            startChildZygote, instructionSet, appDataDir, isTopApp, pkgDataInfoList,
+            whitelistedDataInfoList, bindMountAppDataDirs, bindMountAppStorageDirs);
+
+    ((nativeSpecializeAppProcess_xtc_t *) jni::zygote::nativeSpecializeAppProcess->fnPtr)(
+            env, clazz, uid, gid, gids, debug_flags, rlimits, mount_external, se_info, nice_name
+            , instructionSet, appDataDir);
+
+    nativeSpecializeAppProcess_post(env, clazz, uid, startChildZygote);
+}
+
 [[clang::no_stack_protector]]
 void nativeSpecializeAppProcess_q(
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtimeFlags,
